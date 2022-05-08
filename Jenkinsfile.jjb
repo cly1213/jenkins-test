@@ -1,0 +1,46 @@
+pipeline {
+    agent {
+        docker { image "${params.buildNode}"
+                  args '-u root:root -v $HOME/workspace/myproject:/myproject'
+            
+        }
+    }
+    options {
+        skipDefaultCheckout(true)
+    }
+    environment {
+        JJB_CONFIG = credentials('jjb_config')
+    }
+    stages {
+       stage('Checkout SCM') {
+            steps {
+                echo '> Checking out the source control ...'
+                checkout scm
+            }
+        }
+        stage('Build Packages') {
+            steps {
+                sh '''
+                apt-get update -y
+                apt-get install -y python-pip
+                pip install jenkins-job-builder
+                '''
+            }
+        }
+        stage('Test') {
+            steps {
+                sh '''
+                jenkins-jobs --conf $JJB_CONFIG test test-jjb.yaml
+                '''
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh '''
+                jenkins-jobs --conf $JJB_CONFIG update test-jjb.yaml
+                '''
+            }
+        }
+
+    }
+}

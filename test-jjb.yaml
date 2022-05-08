@@ -1,0 +1,39 @@
+- job-template:
+    id: cly1213-test
+    name: '{name}'
+    project-type: pipeline
+    jenkins-file: Jenkinsfile
+    branch: "**/develop/*"
+    pipeline-scm:
+      scm:
+        - git:
+           url: https://github.com/cly1213/jenkins-test
+           branches:
+             - '{branch}'
+      script-path: '{jenkins-file}'
+
+    properties:
+      - github:
+          url: "https://github.com/cly1213/jenkins-test/"
+    triggers:
+      - github
+    parameters:
+      - string:
+          name: buildNode
+          default: '{build-node}'
+          description: 'Pod management node'
+
+- project:
+    name: hwchiu-jjb-test
+    jobs:
+      - 'cly1213-test':
+          name: 'cly1213-1'
+          build-node: 'ubuntu:16.04'
+      - 'cly1213-test':
+          name: 'cly1213-2'
+          build-node: 'ubuntu:18.04'
+      - 'cly1213-test':
+          name: 'cly1213-jjb'
+          build-node: 'ubuntu:18.04'
+          jenkins-file: Jenkinsfile.jjb
+          branch: 'origin/main'
