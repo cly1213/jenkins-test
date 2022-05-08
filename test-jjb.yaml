@@ -33,6 +33,9 @@
           name: 'cly1213-2'
           build-node: 'ubuntu:18.04'
       - 'cly1213-test':
+          name: 'cly1213-3'
+          build-node: 'ubuntu:20.04'
+      - 'cly1213-test':
           name: 'cly1213-jjb'
           build-node: 'ubuntu:18.04'
           jenkins-file: Jenkinsfile.jjb
